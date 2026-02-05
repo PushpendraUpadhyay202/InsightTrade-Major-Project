@@ -40,7 +40,7 @@ function Navbar() {
                   to="/signup"
                   style={{
                     textDecoration: "none",
-                    paddingLeft: "48px",
+                    paddingLeft: "100px",
                     fontSize: "1.2rem",
                     color: "#666",
                   }}
@@ -54,7 +54,7 @@ function Navbar() {
                   to="/about"
                   style={{
                     textDecoration: "none",
-                    paddingLeft: "48px",
+                    paddingLeft: "90px",
                     fontSize: "1.2rem",
                     color: "#666",
                   }}
@@ -62,7 +62,7 @@ function Navbar() {
                   About
                 </Link>
               </li>
-              <li className="text-muted">
+              {/* <li className="text-muted">
                 <Link
                   className=" active"
                   style={{
@@ -75,8 +75,8 @@ function Navbar() {
                 >
                   Product
                 </Link>
-              </li>
-              <li className=" text-muted  ">
+              </li> */}
+              {/* <li className=" text-muted  ">
                 <Link
                   className=" active"
                   style={{
@@ -89,19 +89,45 @@ function Navbar() {
                 >
                   Pricing
                 </Link>
-              </li>
+              </li> */}
               <li className="nav-item">
                 <Link
                   className="active"
                   style={{
                     textDecoration: "none",
-                    paddingLeft: "48px",
+                    paddingLeft: "90px",
                     fontSize: "1.2rem",
                     color: "#666",
                   }}
                   to="/support"
                 >
                   Support
+                </Link>
+
+                <Link
+                  className="active"
+                  style={{
+                    textDecoration: "none",
+                    paddingLeft: "90px",
+                    fontSize: "1.2rem",
+                    color: "#666",
+                  }}
+                  to="/support"
+                >
+                </Link>
+              </li>
+               <li className=" text-muted  ">
+                <Link
+                  className=" active"
+                  style={{
+                    textDecoration: "none",
+                    paddingLeft: "20px",
+                    fontSize: "1.2rem",
+                    color: "#666",
+                  }}
+                  to="/login"
+                >
+                  Login
                 </Link>
               </li>
             </ul>
