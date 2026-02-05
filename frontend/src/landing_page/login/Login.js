@@ -3,9 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { handleError, handleSuccess } from "../utils";
 
-function Signup() {
-  const [signupInfo, setSignupInfo] = useState({
-    name: "",
+function Login() {
+  const [loginInfo, setLoginInfo] = useState({
     email: "",
     password: "",
   });
@@ -14,31 +13,40 @@ function Signup() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSignupInfo({ ...signupInfo, [name]: value });
+    setLoginInfo({ ...loginInfo, [name]: value });
   };
 
-  const handleSignup = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const { name, email, password } = signupInfo;
+    const { email, password } = loginInfo;
 
-    if (!name || !email || !password) {
-      return handleError("All fields are required");
+    if (!email || !password) {
+      return handleError("Email and password are required");
     }
 
     try {
-      const url = "http://localhost:3002/auth/signup";
-      const response = await fetch(url, {
+      const response = await fetch("http://localhost:3002/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(signupInfo),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginInfo),
       });
 
       const result = await response.json();
-      const { success, message, error } = result;
+      const { success, message, jwtToken, name, error } = result;
 
       if (success) {
         handleSuccess(message);
-        setTimeout(() => navigate("/login"), 1000);
+
+        localStorage.setItem("token", jwtToken);
+        localStorage.setItem("loggedInUser", name);
+
+        // ✅ React navigation (NO PAGE RELOAD)
+        setTimeout(() => {
+          window.location.replace("http://localhost:3001/");
+
+        }, 1000);
       } else if (error) {
         handleError(error?.details?.[0]?.message || message);
       } else {
@@ -51,30 +59,19 @@ function Signup() {
 
   return (
     <>
-      <div className="signup-wrapper">
-        <div className="signup-card">
-          <h1>Create Account</h1>
-          <p className="subtitle">Start your stock simulation journey 🚀</p>
+      <div className="login-wrapper">
+        <div className="login-card">
+          <h1>Welcome Back</h1>
+          <p className="subtitle">Login to your trading dashboard 📈</p>
 
-          <form onSubmit={handleSignup}>
-            <div className="field">
-              <label>Name</label>
-              <input
-                type="text"
-                name="name"
-                placeholder="Enter your name"
-                value={signupInfo.name}
-                onChange={handleChange}
-              />
-            </div>
-
+          <form onSubmit={handleLogin}>
             <div className="field">
               <label>Email</label>
               <input
                 type="email"
                 name="email"
                 placeholder="Enter your email"
-                value={signupInfo.email}
+                value={loginInfo.email}
                 onChange={handleChange}
               />
             </div>
@@ -84,19 +81,19 @@ function Signup() {
               <input
                 type="password"
                 name="password"
-                placeholder="Create a password"
-                value={signupInfo.password}
+                placeholder="Enter your password"
+                value={loginInfo.password}
                 onChange={handleChange}
               />
             </div>
 
-            <button type="submit" className="signup-btn">
-              Sign Up
+            <button type="submit" className="login-btn">
+              Login
             </button>
 
             <p className="switch">
-              Already have an account?{" "}
-              <Link to="/login">Login</Link>
+              Don&apos;t have an account?{" "}
+              <Link to="/signup">Signup</Link>
             </p>
           </form>
         </div>
@@ -104,9 +101,9 @@ function Signup() {
 
       <ToastContainer />
 
-      {/* 🌈 STYLES */}
+      {/* STYLES */}
       <style>{`
-        .signup-wrapper {
+        .login-wrapper {
           min-height: 100vh;
           display: flex;
           align-items: center;
@@ -114,10 +111,10 @@ function Signup() {
           background: linear-gradient(135deg, #eef3ff, #ffffff);
         }
 
-        .signup-card {
+        .login-card {
           width: 420px;
           padding: 40px;
-          background: rgba(255, 255, 255, 0.9);
+          background: rgba(255, 255, 255, 0.92);
           border-radius: 16px;
           box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
           animation: fadeIn 0.6s ease;
@@ -134,7 +131,7 @@ function Signup() {
           }
         }
 
-        .signup-card h1 {
+        .login-card h1 {
           text-align: center;
           margin-bottom: 6px;
           font-size: 1.8rem;
@@ -172,7 +169,7 @@ function Signup() {
           box-shadow: 0 0 0 3px rgba(56, 126, 209, 0.15);
         }
 
-        .signup-btn {
+        .login-btn {
           width: 100%;
           margin-top: 10px;
           padding: 12px;
@@ -186,7 +183,7 @@ function Signup() {
           transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .signup-btn:hover {
+        .login-btn:hover {
           transform: translateY(-2px);
           box-shadow: 0 10px 20px rgba(56, 126, 209, 0.3);
         }
@@ -209,7 +206,7 @@ function Signup() {
         }
 
         @media (max-width: 480px) {
-          .signup-card {
+          .login-card {
             width: 90%;
             padding: 28px;
           }
@@ -219,4 +216,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default Login;
