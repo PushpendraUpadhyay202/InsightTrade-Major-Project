@@ -1,0 +1,24 @@
+.profile-wrapper {
+  position: relative;
+}
+
+.profile-dropdown {
+  position: absolute;
+  right: 10px;
+  top: 50px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  width: 160px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.profile-dropdown p {
+  padding: 10px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.profile-dropdown p:hover {
+  background-color: #f2f2f2;
+}

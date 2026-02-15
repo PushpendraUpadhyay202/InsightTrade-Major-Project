@@ -204,9 +204,89 @@ app.post("/newOrder", async (req, res) => {
     mode: req.body.mode,
   });
 
-  newOrder.save();
+  await newOrder.save();
 
   res.send("Order saved!");
+});
+
+// Create a SELL order only if the stock has been bought before
+app.post("/sellOrder", async (req, res) => {
+  try {
+    const { name, qty, price } = req.body;
+
+    if (!name || !qty || !price) {
+      return res.status(400).json({ error: "Name, quantity and price are required" });
+    }
+
+    // Fetch all orders for this stock to compute net quantity
+    const allOrders = await OrdersModel.find({ name });
+
+    if (!allOrders || allOrders.length === 0) {
+      return res
+        .status(400)
+        .json({ error: "This stock should be present before selling" });
+    }
+
+    let netQty = 0;
+    allOrders.forEach((order) => {
+      if (order.mode === "BUY") {
+        netQty += order.qty;
+      } else if (order.mode === "SELL") {
+        netQty -= order.qty;
+      }
+    });
+
+    if (netQty <= 0) {
+      return res
+        .status(400)
+        .json({ error: "This stock should be present before selling" });
+    }
+
+    if (qty > netQty) {
+      return res
+        .status(400)
+        .json({ error: "Not enough quantity available to sell" });
+    }
+
+    const sellOrder = new OrdersModel({
+      name,
+      qty,
+      price,
+      mode: "SELL",
+    });
+
+    await sellOrder.save();
+
+    return res.json({ message: "Sell order placed successfully" });
+  } catch (err) {
+    console.error("Error placing sell order:", err.message);
+    return res.status(500).json({ error: "Failed to place sell order" });
+  }
+});
+
+// Fetch only BUY orders for positions, without MongoDB _id
+app.get("/buyOrders", async (req, res) => {
+  try {
+    const buyOrders = await OrdersModel.find(
+      { mode: "BUY" },
+      "name qty price -_id"
+    );
+    res.json(buyOrders);
+  } catch (err) {
+    console.error("Error fetching buy orders:", err.message);
+    res.status(500).json({ error: "Failed to fetch buy orders" });
+  }
+});
+
+// Fetch all orders (BUY and SELL) with only name, qty, price, mode (excluding _id)
+app.get("/allOrders", async (req, res) => {
+  try {
+    const allOrders = await OrdersModel.find({}, "name qty price mode -_id");
+    res.json(allOrders);
+  } catch (err) {
+    console.error("Error fetching all orders:", err.message);
+    res.status(500).json({ error: "Failed to fetch orders" });
+  }
 });
 
 // app.listen(PORT, () =>{

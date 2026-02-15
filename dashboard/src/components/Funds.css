@@ -1,0 +1,40 @@
+.funds-container {
+  display: flex;
+  justify-content: center;
+  margin-right: 500px;
+  border-radius: 5px;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.funds-card {
+  width: 300px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  text-align: center;
+  background: #fff;
+}
+
+.funds-card input {
+  width: 80%;
+  padding: 10px;
+  margin: 10px -5px;
+  gap: 20px;
+  border-radius: 5px;
+  padding-right: 5px;
+}
+
+.funds-card button {
+  width:auto;
+  padding: 6px 14px;
+  border-radius: 5px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.funds-card button:hover {
+  background-color: #45a049;
+}

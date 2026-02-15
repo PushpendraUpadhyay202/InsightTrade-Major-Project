@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 
+import "./Menu.css";
+
+import { useNavigate } from "react-router-dom";
+
 import { Link } from "react-router-dom";
 
 const Menu = () => {
@@ -94,7 +98,7 @@ const Menu = () => {
           <div className="avatar">ZU</div>
           <p className="username">USERID</p>
         </div>
-      </div>
+        </div>
     </div>
   );
 };

@@ -97,17 +97,35 @@ const WatchListItem = ({ stock }) => {
           <span className="price">{stock.price}</span>
         </div>
       </div>
-      {showWatchlistActions && <WatchListActions uid={stock.name} />}
+      {showWatchlistActions && <WatchListActions uid={stock.name} price={stock.price} />}
     </li>
   );
 };
 
 // ⬇ Basic Watchlist Action Buttons
-const WatchListActions = ({uid}) => {
+const WatchListActions = ({ uid, price }) => {
   const generalContext = useContext(GeneralContext);
 
   const handleBuyClick = () => {
     generalContext.openBuyWindow(uid);
+  };
+
+  const handleSellClick = async () => {
+    try {
+      // For now, selling 1 quantity at the current watchlist price
+      const response = await axios.post("http://localhost:3002/sellOrder", {
+        name: uid,
+        qty: 1,
+        price,
+      });
+
+      alert(response.data.message || "Sell order placed successfully");
+    } catch (err) {
+      const message =
+        (err.response && err.response.data && err.response.data.error) ||
+        "Failed to place sell order";
+      alert(message);
+    }
   };
   return (
     <span className="actions">
@@ -127,7 +145,7 @@ const WatchListActions = ({uid}) => {
           arrow
           TransitionComponent={Grow}
         >
-          <button className="sell">Sell</button>
+          <button className="sell" onClick={handleSellClick}>Sell</button>
         </Tooltip>
         <Tooltip
           title="Analytics (A)"

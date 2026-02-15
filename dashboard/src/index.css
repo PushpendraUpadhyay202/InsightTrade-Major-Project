@@ -211,6 +211,33 @@ code {
   color: rgb(250, 118, 78);
 }
 
+/* Positions table specific styling */
+.positions-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.positions-table th,
+.positions-table td {
+  padding: 12px 16px;
+  text-align: center;
+}
+
+.positions-table tr th:first-child,
+.positions-table tr td:first-child {
+  text-align: center;
+}
+
+.positions-table thead {
+  background-color: #f7f7f7;
+}
+
+.positions-table th {
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
 .row {
   display: flex;
   align-items: center;
