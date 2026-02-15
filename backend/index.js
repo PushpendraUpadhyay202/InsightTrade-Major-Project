@@ -5,10 +5,10 @@ const mongoose = require("mongoose");
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-const {HoldingsModel} = require('./model/HoldingsModel');
-const {PositionsModel} = require('./model/PositionsModel');
-const { OrdersModel } = require("./model/OrdersModel");
-
+const {HoldingsModel} = require('./Models/HoldingsModel');
+const {PositionsModel} = require('./Models/PositionsModel');
+const { OrdersModel } = require("./Models/OrdersModel");
+const AuthRouter = require('./Routes/AuthRouter')
 const app = express();
 
 const PORT = process.env.PORT || 3002;
@@ -293,8 +293,38 @@ app.get("/allOrders", async (req, res) => {
 //   console.log("App Started");
 //   mongoose.connect(uri);
 //   console.log("DB started");
+
+
+
+//Samyak auth
+app.use('/auth',AuthRouter)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+app.listen(PORT, () =>{
+  console.log("App Started");
+  mongoose.connect(uri);
+  console.log("DB started");
   
-// });
+});
 
 mongoose.set("strictQuery", true);
 

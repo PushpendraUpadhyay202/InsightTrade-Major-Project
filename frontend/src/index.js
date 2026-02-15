@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from 'react-router-dom';   
+import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 
 import Navbar from "./landing_page/Navbar";
@@ -16,8 +16,11 @@ import SupportPage from "./landing_page/support/SupportPage";
 import NotFound from "./landing_page/NotFound";
 
 
+import "react-toastify/dist/ReactToastify.css";
+import App from "./App";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
 root.render(
   <BrowserRouter>
   <Navbar />
@@ -31,7 +34,6 @@ root.render(
       <Route path="*" element={<NotFound />} />
     </Routes>
     <Footer />
+    <App />
   </BrowserRouter>
 );
-
-
