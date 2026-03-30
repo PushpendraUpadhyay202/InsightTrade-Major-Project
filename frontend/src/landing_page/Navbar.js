@@ -9,17 +9,18 @@ function Navbar() {
       <nav className="navbar-main">
         {/* LEFT - LOGO */}
         <div className="nav-left">
-          <Link to="/">
-            <img src="/images/logo" alt="InsightTrade" className="logo" />
+          <Link to="/" className="logo-container">
+            <span className="logo-icon">📈</span>
+            <span className="logo-text">InsightTrade</span>
           </Link>
         </div>
 
         {/* CENTER - LINKS */}
         <ul className="nav-center">
           {[
-            { name: "Signup", path: "/signup" },
             { name: "About", path: "/about" },
             { name: "Support", path: "/support" },
+            { name: "Products", path: "/products" },
           ].map((item) => (
             <li key={item.path}>
               <Link
@@ -32,111 +33,116 @@ function Navbar() {
           ))}
         </ul>
 
-        {/* RIGHT - ICON */}
+        {/* RIGHT - ACTIONS */}
         <div className="nav-right">
-          <i className="fa-solid fa-bars"></i>
+          <Link to="/login" className="login-link-simple">Login</Link>
+          <Link to="/signup" className="signup-cta">Open Account</Link>
+          <div className="mobile-menu-icon">
+            <i className="fa-solid fa-bars"></i>
+          </div>
         </div>
       </nav>
 
-      {/* 🌈 STYLING */}
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
         .navbar-main {
           position: sticky;
           top: 0;
-          z-index: 100;
-
-          height: 90px;
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(10px);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-
+          z-index: 1000;
+          height: 72px; /* Standard professional height */
+          background: rgba(255, 255, 255, 0.8);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border-bottom: 1px solid #f1f5f9;
           display: flex;
           align-items: center;
           justify-content: space-between;
-
-          padding: 0 80px;
-          transition: all 0.3s ease;
+          padding: 0 5%;
+          font-family: 'Inter', sans-serif;
         }
 
-        .nav-left .logo {
-          width: 130px;
-          transition: transform 0.3s ease;
+        .logo-container {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          text-decoration: none;
         }
 
-        .nav-left .logo:hover {
-          transform: scale(1.05);
+        .logo-icon { font-size: 1.5rem; }
+
+        .logo-text {
+          font-size: 1.25rem;
+          font-weight: 800;
+          color: #1e293b;
+          letter-spacing: -0.025em;
         }
 
         .nav-center {
           display: flex;
-          gap: 120px;
+          gap: 40px; /* Reduced from 120px for a tighter look */
           list-style: none;
-          margin: 29px;
-          padding: 20px;
-          padding-right: 102px;
+          margin: 0;
+          padding: 0;
         }
 
         .nav-center a {
           text-decoration: none;
-          font-size: 1.1rem;
+          font-size: 0.95rem;
           font-weight: 500;
-          color: #555;
-          position: relative;
-          padding-bottom: 6px;
-          transition: color 0.3s ease;
+          color: #64748b;
+          transition: all 0.2s ease;
         }
 
-        .nav-center a::after {
-          content: "";
-          position: absolute;
-          left: 0;
-          bottom: 0;
-          width: 0%;
-          height: 2px;
-          background: linear-gradient(90deg, #387ed1, #6aa9ff);
-          transition: width 0.3s ease;
-          border-radius: 2px;
-        }
-
-        .nav-center a:hover {
-          color: #000;
-        }
-
-        .nav-center a:hover::after {
-          width: 100%;
-        }
-
-        .nav-center a.active {
-          color: #387ed1;
-        }
-
-        .nav-center a.active::after {
-          width: 100%;
+        .nav-center a:hover, .nav-center a.active {
+          color: #1e293b;
         }
 
         .nav-right {
-          font-size: 1.4rem;
-          color: #444;
+          display: flex;
+          align-items: center;
+          gap: 24px;
+        }
+
+        .login-link-simple {
+          text-decoration: none;
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: #64748b;
+          transition: color 0.2s;
+        }
+
+        .login-link-simple:hover { color: #1e293b; }
+
+        .signup-cta {
+          text-decoration: none;
+          background: #1e293b;
+          color: white;
+          padding: 10px 20px;
+          border-radius: 8px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          transition: all 0.2s;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .signup-cta:hover {
+          background: #334155;
+          transform: translateY(-1px);
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-menu-icon {
+          display: none;
+          font-size: 1.2rem;
           cursor: pointer;
-          padding: 10px;
-          border-radius: 50%;
-          transition: background 0.3s ease, transform 0.2s ease;
         }
 
-        .nav-right:hover {
-          background: rgba(0, 0, 0, 0.06);
-          transform: rotate(90deg);
-        }
-
-        /* 📱 Mobile */
-        @media (max-width: 768px) {
-          .nav-center {
-            display: none;
-          }
-
-          .navbar-main {
-            padding: 0 24px;
-          }
+        /* 📱 Mobile Responsiveness */
+        @media (max-width: 900px) {
+          .nav-center { display: none; }
+          .mobile-menu-icon { display: block; }
+          .login-link-simple { display: none; }
         }
       `}</style>
     </>

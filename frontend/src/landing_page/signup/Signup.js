@@ -45,35 +45,42 @@ function Signup() {
         handleError(message);
       }
     } catch (err) {
-      handleError("Server error");
+      handleError("Server error. Check if your backend is running.");
     }
   };
 
   return (
     <>
       <div className="signup-wrapper">
+        <div className="background-blobs">
+          <div className="blob blob-1"></div>
+          <div className="blob blob-2"></div>
+        </div>
+
         <div className="signup-card">
-          <h1>Create Account</h1>
-          <p className="subtitle">Start your stock simulation journey 🚀</p>
+          <div className="signup-header">
+            <h1>Create Account</h1>
+            <p className="subtitle">Join the elite trading simulation network 🚀</p>
+          </div>
 
           <form onSubmit={handleSignup}>
             <div className="field">
-              <label>Name</label>
+              <label>Full Name</label>
               <input
                 type="text"
                 name="name"
-                placeholder="Enter your name"
+                placeholder="e.g. Rahul Sharma"
                 value={signupInfo.name}
                 onChange={handleChange}
               />
             </div>
 
             <div className="field">
-              <label>Email</label>
+              <label>Email Address</label>
               <input
                 type="email"
                 name="email"
-                placeholder="Enter your email"
+                placeholder="name@example.com"
                 value={signupInfo.email}
                 onChange={handleChange}
               />
@@ -84,19 +91,19 @@ function Signup() {
               <input
                 type="password"
                 name="password"
-                placeholder="Create a password"
+                placeholder="Create a strong password"
                 value={signupInfo.password}
                 onChange={handleChange}
               />
             </div>
 
             <button type="submit" className="signup-btn">
-              Sign Up
+              Create Account
             </button>
 
             <p className="switch">
               Already have an account?{" "}
-              <Link to="/login">Login</Link>
+              <Link to="/login" className="login-link">Login Here</Link>
             </p>
           </form>
         </div>
@@ -104,115 +111,155 @@ function Signup() {
 
       <ToastContainer />
 
-      {/* 🌈 STYLES */}
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
         .signup-wrapper {
           min-height: 100vh;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(135deg, #eef3ff, #ffffff);
+          background-color: #f8fafc;
+          font-family: 'Inter', sans-serif;
+          position: relative;
+          overflow: hidden;
+        }
+
+        /* Ambient Background Blobs matching the Login theme */
+        .background-blobs {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
+        }
+        .blob {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(80px);
+          opacity: 0.35;
+        }
+        .blob-1 {
+          width: 450px;
+          height: 450px;
+          background: #387ed1;
+          top: -150px;
+          left: -100px;
+        }
+        .blob-2 {
+          width: 350px;
+          height: 350px;
+          background: #60a5fa;
+          bottom: -80px;
+          right: -50px;
         }
 
         .signup-card {
           width: 420px;
-          padding: 40px;
-          background: rgba(255, 255, 255, 0.9);
-          border-radius: 16px;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-          animation: fadeIn 0.6s ease;
+          padding: 48px;
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          border-radius: 28px;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+          z-index: 1;
+          animation: slideUp 0.6s ease-out;
         }
 
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
-        .signup-card h1 {
+        .signup-header {
           text-align: center;
-          margin-bottom: 6px;
-          font-size: 1.8rem;
+          margin-bottom: 32px;
         }
 
-        .subtitle {
-          text-align: center;
-          color: #666;
-          margin-bottom: 24px;
+        .signup-card h1 { 
+          margin: 0;
+          font-size: 1.85rem; 
+          font-weight: 800; 
+          color: #1e293b;
+          letter-spacing: -0.025em;
         }
 
-        .field {
-          display: flex;
-          flex-direction: column;
-          margin-bottom: 18px;
-        }
-
-        .field label {
-          font-size: 0.9rem;
-          margin-bottom: 6px;
-          color: #555;
-        }
-
-        .field input {
-          padding: 12px 14px;
-          border-radius: 10px;
-          border: 1px solid #ddd;
+        .subtitle { 
+          color: #64748b; 
           font-size: 0.95rem;
-          outline: none;
-          transition: all 0.3s ease;
-        }
-
-        .field input:focus {
-          border-color: #387ed1;
-          box-shadow: 0 0 0 3px rgba(56, 126, 209, 0.15);
-        }
-
-        .signup-btn {
-          width: 100%;
           margin-top: 10px;
-          padding: 12px;
-          border: none;
-          border-radius: 10px;
+          line-height: 1.5;
+        }
+
+        .field { 
+          display: flex; 
+          flex-direction: column; 
+          margin-bottom: 20px; 
+        }
+
+        .field label { 
+          font-size: 0.85rem; 
+          font-weight: 600; 
+          margin-bottom: 8px; 
+          color: #475569; 
+        }
+
+        .field input { 
+          padding: 14px 16px; 
+          border-radius: 12px; 
+          border: 1.5px solid #e2e8f0; 
+          outline: none; 
+          font-size: 0.95rem;
+          transition: all 0.2s ease;
+          background: white;
+        }
+
+        .field input:focus { 
+          border-color: #387ed1; 
+          box-shadow: 0 0 0 4px rgba(56, 126, 209, 0.1);
+        }
+
+        .signup-btn { 
+          width: 100%; 
+          margin-top: 10px; 
+          padding: 14px; 
+          border: none; 
+          border-radius: 12px; 
+          background: #1e293b; 
+          color: white; 
           font-size: 1rem;
+          font-weight: 700;
+          cursor: pointer; 
+          transition: all 0.2s ease;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .signup-btn:hover { 
+          background: #334155;
+          transform: translateY(-1px);
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .switch { 
+          margin-top: 24px; 
+          text-align: center; 
+          font-size: 0.9rem; 
+          color: #64748b;
           font-weight: 500;
-          background: linear-gradient(135deg, #387ed1, #5fa2ff);
-          color: white;
-          cursor: pointer;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .signup-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 20px rgba(56, 126, 209, 0.3);
-        }
-
-        .switch {
-          margin-top: 16px;
-          text-align: center;
-          font-size: 0.9rem;
-          color: #555;
-        }
-
-        .switch a {
+        .login-link {
           color: #387ed1;
           text-decoration: none;
-          font-weight: 500;
+          font-weight: 700;
+          margin-left: 4px;
         }
 
-        .switch a:hover {
+        .login-link:hover {
           text-decoration: underline;
         }
 
         @media (max-width: 480px) {
-          .signup-card {
-            width: 90%;
-            padding: 28px;
-          }
+          .signup-card { width: 90%; padding: 32px; }
         }
       `}</style>
     </>

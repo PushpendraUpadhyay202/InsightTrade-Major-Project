@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { handleError, handleSuccess } from "../utils";
 
@@ -8,8 +8,6 @@ function Login() {
     email: "",
     password: "",
   });
-
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,25 +25,21 @@ function Login() {
     try {
       const response = await fetch("http://localhost:3002/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginInfo),
       });
 
       const result = await response.json();
-      const { success, message, jwtToken, name, error } = result;
+      const { success, message, jwtToken, name, userId, error } = result;
 
       if (success) {
         handleSuccess(message);
-
         localStorage.setItem("token", jwtToken);
         localStorage.setItem("loggedInUser", name);
+        localStorage.setItem("userId", userId); 
 
-        // ✅ React navigation (NO PAGE RELOAD)
         setTimeout(() => {
-          window.location.replace("http://localhost:3001/");
-
+          window.location.href = `http://localhost:3001/?userId=${userId}&userName=${name}`;
         }, 1000);
       } else if (error) {
         handleError(error?.details?.[0]?.message || message);
@@ -53,24 +47,31 @@ function Login() {
         handleError(message);
       }
     } catch (err) {
-      handleError("Server error");
+      handleError("Server error. Is your backend running on port 3002?");
     }
   };
 
   return (
     <>
       <div className="login-wrapper">
+        <div className="background-blobs">
+          <div className="blob blob-1"></div>
+          <div className="blob blob-2"></div>
+        </div>
+        
         <div className="login-card">
-          <h1>Welcome Back</h1>
-          <p className="subtitle">Login to your trading dashboard 📈</p>
+          <div className="login-header">
+            <h1>Welcome Back</h1>
+            <p className="subtitle">Enter your credentials to access the terminal 📈</p>
+          </div>
 
           <form onSubmit={handleLogin}>
             <div className="field">
-              <label>Email</label>
+              <label>Email Address</label>
               <input
                 type="email"
                 name="email"
-                placeholder="Enter your email"
+                placeholder="e.g. trader@market.com"
                 value={loginInfo.email}
                 onChange={handleChange}
               />
@@ -81,19 +82,19 @@ function Login() {
               <input
                 type="password"
                 name="password"
-                placeholder="Enter your password"
+                placeholder="••••••••"
                 value={loginInfo.password}
                 onChange={handleChange}
               />
             </div>
 
             <button type="submit" className="login-btn">
-              Login
+              Sign In
             </button>
 
             <p className="switch">
-              Don&apos;t have an account?{" "}
-              <Link to="/signup">Signup</Link>
+              Don't have an account?{" "}
+              <Link to="/signup" className="signup-link">Get Started</Link>
             </p>
           </form>
         </div>
@@ -101,116 +102,153 @@ function Login() {
 
       <ToastContainer />
 
-      {/* STYLES */}
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
         .login-wrapper {
           min-height: 100vh;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(135deg, #eef3ff, #ffffff);
+          background-color: #f8fafc;
+          font-family: 'Inter', sans-serif;
+          position: relative;
+          overflow: hidden;
+        }
+
+        /* Ambient Background Decorative Elements */
+        .background-blobs {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
+        }
+        .blob {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(80px);
+          opacity: 0.4;
+        }
+        .blob-1 {
+          width: 400px;
+          height: 400px;
+          background: #387ed1;
+          top: -100px;
+          right: -100px;
+        }
+        .blob-2 {
+          width: 300px;
+          height: 300px;
+          background: #60a5fa;
+          bottom: -50px;
+          left: -50px;
         }
 
         .login-card {
-          width: 420px;
-          padding: 40px;
-          background: rgba(255, 255, 255, 0.92);
-          border-radius: 16px;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-          animation: fadeIn 0.6s ease;
+          width: 400px;
+          padding: 48px;
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          border-radius: 28px;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+          z-index: 1;
         }
 
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .login-card h1 {
+        .login-header {
           text-align: center;
-          margin-bottom: 6px;
-          font-size: 1.8rem;
+          margin-bottom: 32px;
         }
 
-        .subtitle {
-          text-align: center;
-          color: #666;
-          margin-bottom: 24px;
+        .login-card h1 { 
+          margin: 0;
+          font-size: 1.85rem; 
+          font-weight: 800; 
+          color: #1e293b;
+          letter-spacing: -0.025em;
         }
 
-        .field {
-          display: flex;
-          flex-direction: column;
-          margin-bottom: 18px;
-        }
-
-        .field label {
-          font-size: 0.9rem;
-          margin-bottom: 6px;
-          color: #555;
-        }
-
-        .field input {
-          padding: 12px 14px;
-          border-radius: 10px;
-          border: 1px solid #ddd;
+        .subtitle { 
+          color: #64748b; 
           font-size: 0.95rem;
-          outline: none;
-          transition: all 0.3s ease;
-        }
-
-        .field input:focus {
-          border-color: #387ed1;
-          box-shadow: 0 0 0 3px rgba(56, 126, 209, 0.15);
-        }
-
-        .login-btn {
-          width: 100%;
           margin-top: 10px;
-          padding: 12px;
-          border: none;
-          border-radius: 10px;
+          line-height: 1.5;
+        }
+
+        .field { 
+          display: flex; 
+          flex-direction: column; 
+          margin-bottom: 22px; 
+        }
+
+        .field label { 
+          font-size: 0.85rem; 
+          font-weight: 600; 
+          margin-bottom: 8px; 
+          color: #475569; 
+        }
+
+        .field input { 
+          padding: 14px 16px; 
+          border-radius: 12px; 
+          border: 1.5px solid #e2e8f0; 
+          outline: none; 
+          font-size: 0.95rem;
+          transition: all 0.2s ease;
+          background: white;
+        }
+
+        .field input:focus { 
+          border-color: #387ed1; 
+          box-shadow: 0 0 0 4px rgba(56, 126, 209, 0.1);
+          background: #fff;
+        }
+
+        .login-btn { 
+          width: 100%; 
+          margin-top: 8px; 
+          padding: 14px; 
+          border: none; 
+          border-radius: 12px; 
+          background: #1e293b; 
+          color: white; 
           font-size: 1rem;
+          font-weight: 700;
+          cursor: pointer; 
+          transition: all 0.2s ease;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-btn:hover { 
+          background: #334155;
+          transform: translateY(-1px);
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-btn:active {
+          transform: translateY(0);
+        }
+
+        .switch { 
+          margin-top: 24px; 
+          text-align: center; 
+          font-size: 0.9rem; 
+          color: #64748b;
           font-weight: 500;
-          background: linear-gradient(135deg, #387ed1, #5fa2ff);
-          color: white;
-          cursor: pointer;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .login-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 20px rgba(56, 126, 209, 0.3);
-        }
-
-        .switch {
-          margin-top: 16px;
-          text-align: center;
-          font-size: 0.9rem;
-          color: #555;
-        }
-
-        .switch a {
+        .signup-link {
           color: #387ed1;
           text-decoration: none;
-          font-weight: 500;
+          font-weight: 700;
+          margin-left: 4px;
         }
 
-        .switch a:hover {
+        .signup-link:hover {
           text-decoration: underline;
         }
 
-        @media (max-width: 480px) {
-          .login-card {
-            width: 90%;
-            padding: 28px;
-          }
-        }
+        /* Success/Error Toast Customization logic remains via ToastContainer */
       `}</style>
     </>
   );

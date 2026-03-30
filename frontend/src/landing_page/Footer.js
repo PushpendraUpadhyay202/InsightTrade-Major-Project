@@ -4,43 +4,39 @@ function Footer() {
   return (
     <>
       <footer className="footer">
-        <div className="container">
-          <div className="row footer-top">
+        <div className="footer-container">
+          <div className="footer-grid">
             {/* Brand */}
-            <div className="col-md-3 footer-brand">
-              <img src="/media/images/log.svg" alt="InsightTrade" />
+            <div className="footer-brand">
+              <div className="brand-logo">📈 InsightTrade</div>
               <p className="copyright">
-                © 2010 – 2024, Not InsightTrade Broking Ltd.
+                © 2010 – 2026, Not InsightTrade Broking Ltd.
                 <br />
                 All rights reserved.
               </p>
             </div>
 
             {/* Company */}
-            <div className="col-md-3 footer-col">
+            <div className="footer-col">
               <h5>Company</h5>
               <a href="#">About</a>
               <a href="#">Products</a>
               <a href="#">Pricing</a>
               <a href="#">Referral programme</a>
               <a href="#">Careers</a>
-              <a href="#">InsightTrade.tech</a>
-              <a href="#">Press & media</a>
-              <a href="#">InsightTrade cares (CSR)</a>
             </div>
 
             {/* Support */}
-            <div className="col-md-3 footer-col">
+            <div className="footer-col">
               <h5>Support</h5>
               <a href="#">Contact</a>
               <a href="#">Support portal</a>
               <a href="#">I-Connect blog</a>
               <a href="#">List of charges</a>
-              <a href="#">Downloads & resources</a>
             </div>
 
             {/* Account */}
-            <div className="col-md-3 footer-col">
+            <div className="footer-col">
               <h5>Account</h5>
               <a href="#">Open an account</a>
               <a href="#">Fund transfer</a>
@@ -48,102 +44,116 @@ function Footer() {
             </div>
           </div>
 
-          {/* Legal */}
+          {/* Legal Section */}
           <div className="footer-legal">
             <p>
+              <strong>Disclaimer:</strong> This is a simulation tool for educational purposes. 
               InsightTrade Broking Ltd.: Member of NSE & BSE – SEBI Registration
               no.: INZ000031633. Depository services through InsightTrade
               Securities Pvt. Ltd. – SEBI Registration no.: IN-DP-100-2015.
             </p>
 
             <p>
-              Procedure to file a complaint on SEBI SCORES: Register on SCORES
-              portal. Mandatory details: Name, PAN, Address, Mobile Number,
-              E-mail ID.
-            </p>
-
-            <p>
               Investments in securities market are subject to market risks; read
-              all related documents carefully before investing.
-            </p>
-
-            <p>
-              Prevent unauthorised transactions. Update your mobile number/email
-              with your broker. KYC is a one-time process.
+              all related documents carefully before investing. Prevent unauthorised 
+              transactions by updating your mobile number/email with your broker.
             </p>
           </div>
         </div>
       </footer>
 
-      {/* ✨ Styles */}
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
         .footer {
-          background: #fafafa;
-          border-top: 1px solid #e5e5e5;
-          padding: 60px 0 30px;
-          margin-left:150px;
-          font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+          background: #ffffff;
+          border-top: 1px solid #e2e8f0;
+          padding: 80px 0 40px;
+          font-family: 'Inter', sans-serif;
+          width: 100%;
         }
 
-        .footer-top {
-          margin-bottom: 40px;
+        .footer-container {
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 0 24px;
         }
 
-        .footer-brand img {
-          width: 160px;
-          margin-bottom: 14px;
+        .footer-grid {
+          display: grid;
+          grid-template-columns: 2fr 1fr 1fr 1fr;
+          gap: 40px;
+          margin-bottom: 60px;
+        }
+
+        .brand-logo {
+          font-size: 1.25rem;
+          font-weight: 800;
+          color: #1e293b;
+          margin-bottom: 16px;
+          letter-spacing: -0.025em;
         }
 
         .copyright {
-          font-size: 14px;
-          color: #666;
+          font-size: 0.85rem;
+          color: #64748b;
           line-height: 1.6;
         }
 
         .footer-col h5 {
-          font-size: 18px;
-          margin-bottom: 14px;
-          color: #222;
-          font-weight: 600;
+          font-size: 0.95rem;
+          margin-bottom: 20px;
+          color: #0f172a;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
 
         .footer-col a {
           display: block;
-          font-size: 15px;
-          color: #666;
+          font-size: 0.9rem;
+          color: #64748b;
           text-decoration: none;
-          margin-bottom: 8px;
-          transition: all 0.2s ease;
+          margin-bottom: 12px;
+          transition: color 0.2s ease;
         }
 
         .footer-col a:hover {
-          color: #387ed1;
-          transform: translateX(4px);
+          color: #3b82f6;
         }
 
         .footer-legal {
-          border-top: 1px solid #eaeaea;
-          padding-top: 25px;
-          font-size: 14px;
-          color: #777;
-          line-height: 1.7;
+          border-top: 1px solid #f1f5f9;
+          padding-top: 32px;
+          font-size: 0.75rem;
+          color: #94a3b8;
+          line-height: 1.8;
+          text-align: justify;
         }
 
         .footer-legal p {
-          margin-bottom: 12px;
+          margin-bottom: 16px;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
+          .footer-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+          .footer-brand {
+            grid-column: span 2;
+            margin-bottom: 20px;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .footer-grid {
+            grid-template-columns: 1fr;
+          }
+          .footer-brand {
+            grid-column: span 1;
+          }
           .footer {
-            padding: 40px 20px;
-          }
-
-          .footer-col {
-            margin-bottom: 30px;
-          }
-
-          .footer-brand img {
-            width: 140px;
+            padding: 60px 0 30px;
           }
         }
       `}</style>

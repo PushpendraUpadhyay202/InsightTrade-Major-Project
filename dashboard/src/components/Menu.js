@@ -1,16 +1,26 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Menu = () => {
-  const [selectedMenu, setSelectedMenu] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // ✅ Get logged-in user name
   const username = localStorage.getItem("loggedInUser") || "User";
 
-  // Close dropdown when clicking outside
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const idFromUrl = queryParams.get("userId");
+    const nameFromUrl = queryParams.get("userName");
+
+    if (idFromUrl) {
+      localStorage.setItem("userId", idFromUrl);
+      localStorage.setItem("loggedInUser", nameFromUrl);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -22,9 +32,7 @@ const Menu = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("loggedInUser");
-    // ✅ FIX: redirect to correct frontend
+    localStorage.clear();
     window.location.href = "http://localhost:3000/login";
   };
 
@@ -37,26 +45,38 @@ const Menu = () => {
   ];
 
   return (
-    <div style={styles.container}>
-      {/* LEFT MENU */}
-      <ul style={styles.menuList}>
-        {menus.map((item, index) => (
-          <li key={index}>
-            <Link
-              to={item.path}
-              onClick={() => setSelectedMenu(index)}
-              style={{
-                ...styles.menuItem,
-                ...(selectedMenu === index ? styles.menuActive : {}),
-              }}
-            >
-              {item.name}
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <div style={styles.menuWrapper}>
+      {/* NAVIGATION LINKS */}
+      <nav>
+        <ul style={styles.menuList}>
+          {menus.map((item, index) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li key={index}>
+                <Link
+                  to={item.path}
+                  style={{
+                    ...styles.menuItem,
+                    ...(isActive ? styles.menuActive : {}),
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) e.target.style.color = "var(--text-main)";
+                    if (!isActive) e.target.style.backgroundColor = "rgba(0,0,0,0.03)";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) e.target.style.color = "var(--text-muted)";
+                    if (!isActive) e.target.style.backgroundColor = "transparent";
+                  }}
+                >
+                  {item.name}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
 
-      {/* RIGHT PROFILE */}
+      {/* PROFILE SECTION */}
       <div style={styles.profileWrapper} ref={dropdownRef}>
         <div
           style={styles.profile}
@@ -66,21 +86,35 @@ const Menu = () => {
             {username.charAt(0).toUpperCase()}
           </div>
           <span style={styles.username}>{username}</span>
+          <span style={styles.chevron}>{showDropdown ? "▴" : "▾"}</span>
         </div>
 
+        {/* GLASS DROPDOWN */}
         {showDropdown && (
-          <div style={styles.dropdown}>
+          <div className="animate-entry" style={styles.dropdown}>
             <div
               style={styles.dropdownItem}
-              onClick={() => navigate("/profile")}
+              onClick={() => {
+                navigate("/profile");
+                setShowDropdown(false);
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = "#f8fafc"}
+              onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
             >
-              👤 Profile
+              <span style={{ fontSize: "16px" }}>👤</span>
+              <span>Account Profile</span>
             </div>
+            
+            <div style={styles.divider} />
+            
             <div
-              style={{ ...styles.dropdownItem, color: "#e53935" }}
+              style={{ ...styles.dropdownItem, color: "var(--accent-red)" }}
               onClick={handleLogout}
+              onMouseEnter={(e) => e.target.style.backgroundColor = "#fff1f2"}
+              onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
             >
-              🚪 Logout
+              <span style={{ fontSize: "16px" }}>⎋</span>
+              <span style={{ fontWeight: "600" }}>Sign Out</span>
             </div>
           </div>
         )}
@@ -89,95 +123,105 @@ const Menu = () => {
   );
 };
 
-/* ===================== STYLES ===================== */
+/* ===================== EXTREME STYLES ===================== */
 
 const styles = {
-  container: {
+  menuWrapper: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 160px",
-    height: "64px",
-    backgroundColor: "#ffffff",
-    borderBottom: "1px solid #e2e8f0",
-    fontFamily: "Inter, system-ui, sans-serif",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+    gap: "40px",
   },
-
   menuList: {
     display: "flex",
     listStyle: "none",
-    gap: "40px",
+    gap: "8px", // Tight gap for pill-style buttons
     margin: 0,
     padding: 0,
+    alignItems: "center",
   },
-
   menuItem: {
     textDecoration: "none",
-    fontSize: "15px",
-    color: "#475569",
-    paddingBottom: "6px",
-    transition: "all 0.2s ease",
+    fontSize: "13px",
+    color: "var(--text-muted)",
+    padding: "8px 16px",
+    borderRadius: "20px", // Pill shape
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+    fontWeight: "500",
+    letterSpacing: "-0.01em",
   },
-
   menuActive: {
-    color: "#ff5722",
-    borderBottom: "2px solid #ff5722",
-    fontWeight: 600,
+    color: "var(--accent-blue)",
+    backgroundColor: "rgba(0, 71, 255, 0.06)",
+    fontWeight: "600",
   },
-
   profileWrapper: {
     position: "relative",
+    paddingLeft: "20px",
+    borderLeft: "1px solid rgba(0,0,0,0.06)",
   },
-
   profile: {
     display: "flex",
     alignItems: "center",
-    gap: "14px",
+    gap: "12px",
     cursor: "pointer",
-    padding: "6px 10px",
-    borderRadius: "8px",
+    padding: "6px 12px",
+    borderRadius: "12px",
     transition: "background 0.2s ease",
   },
-
   avatar: {
-    width: "34px",
-    height: "34px",
-    borderRadius: "50%",
-    background: "linear-gradient(135deg, #ff7043, #ff5722)",
+    width: "32px",
+    height: "32px",
+    borderRadius: "10px", // Modern squircle instead of circle
+    background: "linear-gradient(135deg, #0f172a 0%, #334155 100%)",
     color: "#fff",
-    fontSize: "14px",
-    fontWeight: 600,
+    fontSize: "12px",
+    fontWeight: "700",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
   },
-
   username: {
     fontSize: "14px",
-    color: "#1e293b",
-    fontWeight: 500,
+    color: "var(--text-main)",
+    fontWeight: "600",
+    letterSpacing: "-0.02em",
   },
-
+  chevron: {
+    fontSize: "10px",
+    color: "var(--text-muted)",
+  },
   dropdown: {
     position: "absolute",
-    top: "48px",
+    top: "55px",
     right: 0,
-    width: "160px",
-    backgroundColor: "#fff",
-    borderRadius: "10px",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
-    overflow: "hidden",
-    zIndex: 999,
+    width: "200px",
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    backdropFilter: "blur(20px)",
+    WebkitBackdropFilter: "blur(20px)",
+    borderRadius: "16px",
+    boxShadow: "var(--shadow-float)",
+    border: "1px solid rgba(255, 255, 255, 0.5)",
+    padding: "8px",
+    zIndex: 3000,
   },
-
   dropdownItem: {
     padding: "12px 14px",
-    fontSize: "14px",
+    fontSize: "13px",
+    fontWeight: "500",
     cursor: "pointer",
-    transition: "background 0.2s ease",
+    color: "var(--text-main)",
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    borderRadius: "10px",
+    transition: "all 0.2s ease",
   },
+  divider: {
+    height: "1px",
+    backgroundColor: "rgba(0,0,0,0.04)",
+    margin: "8px 0",
+  }
 };
 
 export default Menu;

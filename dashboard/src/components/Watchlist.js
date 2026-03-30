@@ -1,150 +1,120 @@
-import React, { useState , useContext } from "react";
-
-import axios from 'axios';
+import React, { useState, useEffect, useContext } from "react";
+import axios from "axios";
 import GeneralContext from "./GeneralContext";
-
-import {Tooltip, Grow} from "@mui/material";
-
-import {
-  BarChartOutlined,
-  KeyboardArrowDown,
-  KeyboardArrowUp,
-  MoreHoriz,
-} from "@mui/icons-material";
-
-import { DoughnutChart } from "./DoughnoutChart";
-import { watchlist } from "../data/data";
-
-const labels = watchlist.map((subArray) => subArray["name"]);
+import { BarChartOutlined, KeyboardArrowDown, KeyboardArrowUp, AddCircleOutline } from "@mui/icons-material";
+import { watchlist as initialWatchlist } from "../data/data";
 
 const WatchList = () => {
+  const [liveWatchlist, setLiveWatchlist] = useState([]);
 
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: "Price",
-        data: watchlist.map((stock) => stock.price),
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.5)",
-          "rgba(54, 162, 235, 0.5)",
-          "rgba(255, 206, 86, 0.5)",
-          "rgba(75, 192, 192, 0.5)",
-          "rgba(153, 102, 255, 0.5)",
-          "rgba(255, 159, 64, 0.5)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
+  useEffect(() => {
+    const fetchLivePrices = async () => {
+      try {
+        const symbols = initialWatchlist.map((s) => s.name);
+        const res = await axios.post("http://localhost:3002/livePrices", { symbols });
+        setLiveWatchlist(res.data);
+      } catch (err) {
+        console.error("Watchlist sync failed:", err);
+        setLiveWatchlist(initialWatchlist);
+      }
+    };
+
+    fetchLivePrices();
+    const interval = setInterval(fetchLivePrices, 60000); // Sync every 1 minute
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="watchlist-container">
-      <div className="search-container">
-        <input
-          type="text"
-          name="search"
-          id="search"
-          placeholder="Search eg: infy, bse, gold mcx"
-          className="search"
-        />
-        <span className="counts"> {watchlist.length} / 50</span>
+    <div style={styles.watchlistContainer}>
+      <div className="custom-scroll" style={styles.scrollArea}>
+        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+          {liveWatchlist.map((stock, index) => (
+            <WatchListItem stock={stock} key={index} />
+          ))}
+        </ul>
       </div>
-
-      <ul className="list">
-        {watchlist.map((stock, index) => (
-          <WatchListItem stock={stock} key={index} />
-        ))}
-      </ul>
-
-      <DoughnutChart data={data} />  //calling
     </div>
   );
 };
 
-export default WatchList;
-
-// ⬇ Only Watchlist Item Component
 const WatchListItem = ({ stock }) => {
-   const [showWatchlistActions, setShowWatchlistActions] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const generalContext = useContext(GeneralContext);
 
-   const handleMouseEnter=(e)=>{
-    setShowWatchlistActions(true);
-   };
-
-   const handleMouseLeave = (e) =>{
-    setShowWatchlistActions(false);
-   }
+  // Safety: Fallback to 0 if price is undefined/null to prevent crash
+  const currentPrice = stock.price ?? 0;
+  const priceColor = stock.isDown ? "var(--accent-red)" : "var(--accent-green)";
 
   return (
-     <li onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-      <div className="item">
-        <p className={stock.isDown ? "down" : "up"}>{stock.name}</p>
-        <div className="itemInfo">
-          <span className="percent">{stock.percent}</span>
-          {stock.isDown ? (
-            <KeyboardArrowDown className="down" />
-          ) : (
-            <KeyboardArrowUp className="down" />
-          )}
-          <span className="price">{stock.price}</span>
+    <li 
+      className="stock-row" 
+      onMouseEnter={() => setIsHovered(true)} 
+      onMouseLeave={() => setIsHovered(false)} 
+      style={{
+        ...styles.stockRow,
+        borderLeft: isHovered ? `4px solid ${priceColor}` : "4px solid transparent",
+        backgroundColor: isHovered ? "rgba(0,0,0,0.02)" : "transparent"
+      }}
+    >
+      <div style={styles.itemMain}>
+        <div style={styles.symbolRow}>
+          <p style={{ ...styles.symbol, color: priceColor }}>{stock.name}</p>
+          <span className="data-number" style={{...styles.priceText, color: isHovered ? priceColor : "var(--text-main)"}}>
+            {/* ✅ Fixed: Added fallback to prevent toLocaleString error */}
+            {currentPrice.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+          </span>
+        </div>
+        
+        <div style={styles.itemInfo}>
+          <span style={styles.percentText}>{stock.percent || "0.00%"}</span>
+          {stock.isDown ? 
+            <KeyboardArrowDown style={{fontSize: "14px", color: "var(--accent-red)"}} /> : 
+            <KeyboardArrowUp style={{fontSize: "14px", color: "var(--accent-green)"}} />
+          }
         </div>
       </div>
-      {showWatchlistActions && <WatchListActions uid={stock.name} />}
+
+      {isHovered && (
+        <div className="animate-entry" style={styles.actionsBox}>
+          <button 
+            style={styles.buyBtn} 
+            onClick={() => generalContext.openBuyWindow(stock.name, currentPrice)}
+          >
+            BUY
+          </button>
+          {/* <button style={styles.sellBtn}>SELL</button> */}
+          {/* <button style={styles.iconBtn}><BarChartOutlined style={{fontSize: "18px"}}/></button> */}
+          {/* <button style={styles.iconBtn}><AddCircleOutline style={{fontSize: "18px"}}/></button> */}
+        </div>
+      )}
     </li>
   );
 };
 
-// ⬇ Basic Watchlist Action Buttons
-const WatchListActions = ({uid}) => {
-  const generalContext = useContext(GeneralContext);
-
-  const handleBuyClick = () => {
-    generalContext.openBuyWindow(uid);
-  };
-  return (
-    <span className="actions">
-      <span>
-        <Tooltip
-          title="Buy (B)"
-          placement="top"
-          arrow
-          TransitionComponent={Grow}
-          onClick={handleBuyClick}
-        >
-          <button className="buy">Buy</button>
-        </Tooltip>
-        <Tooltip
-          title="Sell (S)"
-          placement="top"
-          arrow
-          TransitionComponent={Grow}
-        >
-          <button className="sell">Sell</button>
-        </Tooltip>
-        <Tooltip
-          title="Analytics (A)"
-          placement="top"
-          arrow
-          TransitionComponent={Grow}
-        >
-          <button className="action">
-            <BarChartOutlined className="icon" />
-          </button>
-        </Tooltip>
-        <Tooltip title="More" placement="top" arrow TransitionComponent={Grow}>
-          <button className="action">
-            <MoreHoriz className="icon" />
-          </button>
-        </Tooltip>
-      </span>
-    </span>
-  );
+const styles = {
+  watchlistContainer: { 
+    width: "100%", height: "100%", background: "transparent", 
+    display: "flex", flexDirection: "column", borderRight: "1px solid rgba(0,0,0,0.05)"
+  },
+  scrollArea: { flex: 1, overflowY: "auto", background: "#fff" },
+  stockRow: { 
+    display: "flex", flexDirection: "column", padding: "14px 20px", 
+    borderBottom: "1px solid rgba(0,0,0,0.03)", cursor: "pointer", 
+    position: "relative", transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+  },
+  symbolRow: { display: "flex", justifyContent: "space-between", alignItems: "center" },
+  symbol: { fontSize: "13px", fontWeight: "700", margin: 0, letterSpacing: "-0.01em" },
+  itemInfo: { display: "flex", alignItems: "center", gap: "4px", marginTop: "4px" },
+  percentText: { fontSize: "11px", color: "var(--text-muted)", fontWeight: "500" },
+  priceText: { fontSize: "14px", fontWeight: "600", transition: "color 0.2s ease" },
+  actionsBox: { 
+    position: "absolute", top: 0, bottom: 0, right: 0, display: "flex", 
+    alignItems: "center", gap: "4px", background: "linear-gradient(to left, #fff 85%, transparent)", 
+    padding: "0 15px 0 40px", zIndex: 2
+  },
+  buyBtn: { border: "none", borderRadius: "4px", padding: "6px 12px", background: "var(--accent-blue)", color: "#fff", fontWeight: "800", fontSize: "10px", cursor: "pointer" },
+  sellBtn: { border: "none", borderRadius: "4px", padding: "6px 12px", background: "var(--accent-red)", color: "#fff", fontWeight: "800", fontSize: "10px", cursor: "pointer" },
+  iconBtn: { background: "rgba(0,0,0,0.03)", border: "none", borderRadius: "4px", width: "28px", height: "28px", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)", cursor: "pointer" }
 };
+
+export default WatchList;
